@@ -10,24 +10,26 @@ class Controls {
 class HumanControls extends Controls {
     constructor() {
         super();
-        this.#addKeyboardListeners();
-    }
-
-    #addKeyboardListeners() {
-        const keymap = {
+        this.keymap = {
             "ArrowUp":"gas",
             "ArrowDown":"brake",
             "ArrowLeft":"left",
             "ArrowRight":"right"
         }
+        this.#addKeyboardListeners();
+    }
+
+    #addKeyboardListeners() {
         document.addEventListener("keydown", (event) => {
-            if (keymap[event.key] !== undefined && this[keymap[event.key]] !== undefined) {
-                this[keymap[event.key]] = true;
+            const controlName = this.keymap[event.key];
+            if (controlName !== undefined && this[controlName] !== undefined) {
+                this[controlName] = true;
             }
         })
         document.addEventListener("keyup", (event) => {
-            if (keymap[event.key] !== undefined && this[keymap[event.key]] !== undefined) {
-                this[keymap[event.key]] = false;
+            const controlName = this.keymap[event.key];
+            if (controlName !== undefined && this[controlName] !== undefined) {
+                this[controlName] = false;
             }
         })
     }
