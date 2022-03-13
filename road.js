@@ -17,9 +17,13 @@ class Road {
     }
 
     laneCenter(laneId) {
+        laneId = laneId % this.lanes;
+        if (laneId < 0) {
+            laneId = laneId + this.lanes;
+        }
         const laneWidth = this.width / this.lanes;
         const offset = this.left + laneWidth * 0.5;
-        return offset + laneId * this.lanes;
+        return offset + laneId * laneWidth;
     }
 
     draw(context) {
