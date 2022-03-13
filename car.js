@@ -75,6 +75,7 @@ class Car {
 
     draw(context) {
         context.save();
+        context.fillStyle="#FFFFFF";
         context.translate(this.x, this.y);
         context.rotate(this.angle);
 

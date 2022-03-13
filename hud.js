@@ -4,8 +4,9 @@ class Hud {
             Hud.#updateKey(key, value)
         }
     }
+
     static #updateKey = (key, value) => {
-        const el = document.getElementById(key+"Value")
+        const el = document.getElementById(key + "Value")
         if (!el) {
             return;
         }
