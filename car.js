@@ -1,9 +1,8 @@
 class Car {
-    constructor(x, y, width, height, imageFilename, controls) {
+    constructor(x, y, scale, imageFilename, controls) {
         this.x = x;
         this.y = y;
-        this.width = width;
-        this.height = height;
+        this.scale = scale;
         this.controls = controls;
 
         this.image = new Image();
@@ -19,6 +18,14 @@ class Car {
     }
 
     update() {
+        this.#updateInput();
+        this.#updatePhysics();
+        this.#updateImageState();
+        console.hud(this);
+        console.hud(this.controls);
+    }
+
+    #updateInput() {
         // input
         if (this.controls.gas) {
             this.speed += this.acceleration;
@@ -26,7 +33,9 @@ class Car {
         if (this.controls.brake) {
             this.speed -= this.acceleration;
         }
+    }
 
+    #updatePhysics() {
         // physics bounds checking
         if (this.speed > this.maxSpeed) {
             this.speed = this.maxSpeed;
@@ -70,17 +79,31 @@ class Car {
         // position update
         this.x += Math.sin(this.angle) * this.speed;
         this.y -= Math.cos(this.angle) * this.speed; // y starts at top so subtract
-        console.hud(this);
-        console.hud(this.controls);
+    }
+
+    #updateImageState() {
+        var src = "van.png";
+        if (this.gear === "D") {
+            if (this.controls.brake) {
+                src = "van_D_brake.png"
+            }
+        } else if (this.gear === "R") {
+            src = "van_R_brake.png"
+        }
+        if (this.image.src !== src) {
+            this.image.src = src;
+        }
     }
 
     draw(context) {
         context.save();
 
+        const width = this.image.width * this.scale;
+        const height = this.image.height * this.scale;
+
         context.translate(this.x, this.y);
         context.rotate(this.angle);
-        context.drawImage(this.image, -this.width * 0.5, -this.height*.6, this.width, this.height);
-
+        context.drawImage(this.image, -width * 0.5, -height * .6, width, height);
 
 
         // context.beginPath();
