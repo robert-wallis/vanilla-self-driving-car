@@ -1,20 +1,21 @@
 class Car {
-    constructor(x, y, width, height) {
+    constructor(x, y, width, height, imageFilename, controls) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
+        this.controls = controls;
+
+        this.image = new Image();
+        this.image.src = imageFilename;
 
         this.speed = 0;
         this.acceleration = 0.2;
-        this.maxSpeed = 3;
+        this.maxSpeed = 10;
         this.minSpeed = -this.maxSpeed * 0.5;
         this.friction = 0.05;
         this.angle = 0;
-
         this.gear = "N";
-
-        this.controls = new HumanControls();
     }
 
     update() {
@@ -34,7 +35,7 @@ class Car {
             if (this.speed < 0) {
                 this.speed = 0;
             } else if (this.speed === 0) {
-                this.gear = null;
+                this.gear = "N";
             }
         } else if (this.gear === "R") {
             if (this.speed < this.minSpeed) {
@@ -42,7 +43,7 @@ class Car {
             } else if (this.speed > 0) {
                 this.speed = 0;
             } else if (this.speed === 0) {
-                this.gear = null;
+                this.gear = "N";
             }
         } else { // neutral gear
             if (this.speed > 0) {
@@ -75,13 +76,17 @@ class Car {
 
     draw(context) {
         context.save();
-        context.fillStyle="#FFFFFF";
+
         context.translate(this.x, this.y);
         context.rotate(this.angle);
+        context.drawImage(this.image, -this.width * 0.5, -this.height*.6, this.width, this.height);
 
-        context.beginPath();
-        context.rect(-this.width/2, -this.height/2, this.width, this.height);
-        context.fill();
+
+
+        // context.beginPath();
+        // context.fillStyle = "#FFFFFF";
+        // context.rect(-this.width/2, -this.height/2, this.width, this.height);
+        // context.fill();
 
         context.restore();
     }
