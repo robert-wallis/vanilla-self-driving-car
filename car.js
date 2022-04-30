@@ -25,6 +25,25 @@ class Car {
         console.hud(this.controls);
     }
 
+    draw(context) {
+        context.save();
+
+        const width = this.image.width * this.scale;
+        const height = this.image.height * this.scale;
+
+        context.translate(this.x, this.y);
+        context.rotate(this.angle);
+        context.drawImage(this.image, -width * 0.5, -height * .6, width, height);
+
+
+        // context.beginPath();
+        // context.fillStyle = "#FFFFFF";
+        // context.rect(-this.width/2, -this.height/2, this.width, this.height);
+        // context.fill();
+
+        context.restore();
+    }
+
     #updateInput() {
         // input
         if (this.controls.gas) {
@@ -99,22 +118,4 @@ class Car {
         }
     }
 
-    draw(context) {
-        context.save();
-
-        const width = this.image.width * this.scale;
-        const height = this.image.height * this.scale;
-
-        context.translate(this.x, this.y);
-        context.rotate(this.angle);
-        context.drawImage(this.image, -width * 0.5, -height * .6, width, height);
-
-
-        // context.beginPath();
-        // context.fillStyle = "#FFFFFF";
-        // context.rect(-this.width/2, -this.height/2, this.width, this.height);
-        // context.fill();
-
-        context.restore();
-    }
 }
