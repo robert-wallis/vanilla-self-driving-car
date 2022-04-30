@@ -38,7 +38,7 @@ class Road {
             this.width + tarmacOvershoot * 2.0, this.bottom - this.top);
         context.fill();
 
-        context.setLineDash([15, 20]);
+        context.setLineDash([80, 100]);
         for (let i = 1; i < this.lanes; i++) {
             const x = lerp(this.left, this.right, i / this.lanes);
             context.beginPath();

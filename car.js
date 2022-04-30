@@ -68,11 +68,15 @@ class Car {
         // rotation update
         if (this.speed !== 0) {
             const angleDelta = this.speed > 0 ? 0.03 : -0.03;
+            let newAngle = null;
             if (this.controls.right) {
-                this.angle += angleDelta;
+                newAngle = this.angle + angleDelta;
             }
             if (this.controls.left) {
-                this.angle -= angleDelta;
+                newAngle = this.angle - angleDelta;
+            }
+            if (newAngle) {
+                this.angle = newAngle % (Math.PI * 2);
             }
         }
 
@@ -82,7 +86,7 @@ class Car {
     }
 
     #updateImageState() {
-        var src = "van.png";
+        let src = "van.png";
         if (this.gear === "D") {
             if (this.controls.brake) {
                 src = "van_D_brake.png"

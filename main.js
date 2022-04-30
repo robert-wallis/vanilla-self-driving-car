@@ -8,6 +8,7 @@ const hud = new Hud();
 console.hud = hud.update;
 window.road = new Road(canvas.width * 0.5, 500 * 0.9, 5);
 window.car = new Car(road.laneCenter(-1), canvas.height * 0.8, 0.6, "van.png", humanPlayer);
+window.sensor = new Sensor(car);
 animate();
 
 function updateCanvasSize() {
@@ -20,6 +21,7 @@ function updateCanvasSize() {
 
 function animate() {
     car.update();
+    sensor.update(road.borders);
 
     updateCanvasSize()
 
@@ -29,6 +31,7 @@ function animate() {
 
     road.draw(context);
     car.draw(context);
+    sensor.draw(context);
 
     context.restore();
 
