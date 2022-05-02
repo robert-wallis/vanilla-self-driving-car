@@ -18,3 +18,20 @@ function intersect(A, B, C, D) {
     }
     return {x: lerp(A.x, B.x, t), y: lerp(A.y, B.y, t), offset: t}
 }
+
+function polysIntersect(P1, P2) {
+    for (let i = 0; i < P1.length; i++) {
+        for (let j = 0; j < P2.length; j++) {
+            const hit = intersect(
+                P1[i],
+                P1[(i + 1) % P1.length],
+                P2[j],
+                P2[(j + 1) % P2.length]
+            );
+            if (hit) {
+                return true;
+            }
+        }
+    }
+    return false;
+}

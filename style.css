@@ -13,6 +13,12 @@ body {
     color: var(--main-text);
 }
 #canvas {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
     width: 100%;
     height: 100%;
 }
@@ -23,7 +29,11 @@ body {
     right: 1rem;
     border: solid 1px #969696;
     border-radius: 0.5rem;
+    background-color: hsl(0deg, 0%, 10%, 80%);
+    color: #FFFFFF;
+    font: 1em sans-serif;
 }
 #hud tr > td:first-child {
     text-align: right;
+    color: #888888;
 }

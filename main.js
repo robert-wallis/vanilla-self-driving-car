@@ -9,9 +9,12 @@ console.hud = hud.update;
 window.road = new Road(canvas.width * 0.5, 500 * 0.9, 5);
 window.car = new Car(road.laneCenter(-1), canvas.height * 0.8, 0.6, "van.png", humanPlayer);
 window.sensor = new Sensor(car);
+window.addEventListener("resize", updateCanvasSize);
 animate();
 
 function updateCanvasSize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
     if (canvas.height !== canvas.clientHeight ||
         canvas.width !== canvas.clientWidth) {
         canvas.height = canvas.clientHeight;
@@ -20,10 +23,8 @@ function updateCanvasSize() {
 }
 
 function animate() {
-    car.update();
+    car.update(road.borders);
     sensor.update(road.borders);
-
-    updateCanvasSize()
 
     context.clearRect(0, 0, canvas.width, canvas.height);
     context.save();

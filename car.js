@@ -7,6 +7,7 @@ class Car {
 
         this.image = new Image();
         this.image.src = imageFilename;
+        this.corners = [];
 
         this.speed = 0;
         this.acceleration = 0.2;
@@ -15,33 +16,38 @@ class Car {
         this.friction = 0.05;
         this.angle = 0;
         this.gear = "N";
+        this.damaged = false;
     }
 
-    update() {
+    update(roadBorders) {
         this.#updateInput();
         this.#updatePhysics();
+        this.corners = this.#findCorners();
+        this.#updateCollision(roadBorders);
         this.#updateImageState();
         console.hud(this);
         console.hud(this.controls);
     }
 
-    draw(context) {
-        context.save();
+    draw(ctx) {
+        ctx.save();
 
         const width = this.image.width * this.scale;
         const height = this.image.height * this.scale;
 
-        context.translate(this.x, this.y);
-        context.rotate(this.angle);
-        context.drawImage(this.image, -width * 0.5, -height * .6, width, height);
+        ctx.fillStyle = this.damaged ? "#421d1d" : "#ffc01f";
+        ctx.beginPath();
+        ctx.moveTo(this.corners[0].x, this.corners[0].y);
+        for (let i = 1; i < this.corners.length; i++) {
+            ctx.lineTo(this.corners[i].x, this.corners[i].y);
+        }
+        ctx.fill();
 
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.angle);
+        ctx.drawImage(this.image, -width * 0.5, -height * 0.5, width, height);
 
-        // context.beginPath();
-        // context.fillStyle = "#FFFFFF";
-        // context.rect(-this.width/2, -this.height/2, this.width, this.height);
-        // context.fill();
-
-        context.restore();
+        ctx.restore();
     }
 
     #updateInput() {
@@ -104,18 +110,52 @@ class Car {
         this.y -= Math.cos(this.angle) * this.speed; // y starts at top so subtract
     }
 
+    #updateCollision(roadBorders) {
+        let damaged = false;
+        for (let i = 0; i < roadBorders.length; i++) {
+            if (polysIntersect(this.corners, roadBorders[1])) {
+                damaged = true;
+                break;
+            }
+        }
+        this.damaged = damaged;
+    }
+
     #updateImageState() {
         let src = "van.png";
         if (this.gear === "D") {
             if (this.controls.brake) {
-                src = "van_D_brake.png"
+                src = "van_D_brake.png";
             }
         } else if (this.gear === "R") {
-            src = "van_R_brake.png"
+            src = "van_R_brake.png";
         }
         if (this.image.src !== src) {
             this.image.src = src;
         }
     }
 
+    #findCorners() {
+        const corners = [];
+        const radius = Math.hypot(this.image.width, this.image.height) * 0.5;
+        const a = Math.atan2(this.image.width, this.image.height);
+        const rs = radius * this.scale * 0.9;
+        corners.push({
+            x: this.x + Math.sin(-this.angle + a) * rs,
+            y: this.y + Math.cos(-this.angle + a) * rs
+        });
+        corners.push({
+            x: this.x + Math.sin(-this.angle - a) * rs,
+            y: this.y + Math.cos(-this.angle - a) * rs
+        });
+        corners.push({
+            x: this.x + Math.sin(-this.angle + a + Math.PI) * rs,
+            y: this.y + Math.cos(-this.angle + a + Math.PI) * rs
+        });
+        corners.push({
+            x: this.x + Math.sin(-this.angle - a - Math.PI) * rs,
+            y: this.y + Math.cos(-this.angle - a - Math.PI) * rs
+        });
+        return corners;
+    }
 }
