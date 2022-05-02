@@ -4,6 +4,7 @@ class Controls {
         this.brake = false;
         this.left = false;
         this.right = false;
+        this.reset = false;
     }
 }
 
@@ -14,7 +15,8 @@ class HumanControls extends Controls {
             "ArrowUp":"gas",
             "ArrowDown":"brake",
             "ArrowLeft":"left",
-            "ArrowRight":"right"
+            "ArrowRight":"right",
+            "Escape":"reset",
         }
         this.#addKeyboardListeners();
     }

@@ -23,6 +23,11 @@ function updateCanvasSize() {
 }
 
 function animate() {
+    if (humanPlayer.reset) {
+        // noinspection SillyAssignmentJS
+        window.location.href = window.location.href;
+    }
+
     car.update(road.borders);
     sensor.update(road.borders);
 

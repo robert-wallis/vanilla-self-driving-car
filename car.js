@@ -35,13 +35,15 @@ class Car {
         const width = this.image.width * this.scale;
         const height = this.image.height * this.scale;
 
-        ctx.fillStyle = this.damaged ? "#421d1d" : "#ffc01f";
-        ctx.beginPath();
-        ctx.moveTo(this.corners[0].x, this.corners[0].y);
-        for (let i = 1; i < this.corners.length; i++) {
-            ctx.lineTo(this.corners[i].x, this.corners[i].y);
+        if (this.damaged) {
+            ctx.fillStyle = "#571414";
+            ctx.beginPath();
+            ctx.moveTo(this.corners[0].x, this.corners[0].y);
+            for (let i = 1; i < this.corners.length; i++) {
+                ctx.lineTo(this.corners[i].x, this.corners[i].y);
+            }
+            ctx.fill();
         }
-        ctx.fill();
 
         ctx.translate(this.x, this.y);
         ctx.rotate(this.angle);
@@ -61,6 +63,10 @@ class Car {
     }
 
     #updatePhysics() {
+        if (this.damaged) {
+            this.speed = 0;
+            return;
+        }
         // physics bounds checking
         if (this.speed > this.maxSpeed) {
             this.speed = this.maxSpeed;
@@ -113,7 +119,7 @@ class Car {
     #updateCollision(roadBorders) {
         let damaged = false;
         for (let i = 0; i < roadBorders.length; i++) {
-            if (polysIntersect(this.corners, roadBorders[1])) {
+            if (polysIntersect(this.corners, roadBorders[i])) {
                 damaged = true;
                 break;
             }
