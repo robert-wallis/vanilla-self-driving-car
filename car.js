@@ -1,9 +1,10 @@
 class Car {
-    constructor(x, y, scale, imageFilename, controls) {
+    constructor({x, y, scale, imageFilename, controls, maxSpeed=9, hud=null}) {
         this.x = x;
         this.y = y;
         this.scale = scale;
         this.controls = controls;
+        this.hud = hud;
 
         this.image = new Image();
         this.image.src = imageFilename;
@@ -11,7 +12,7 @@ class Car {
 
         this.speed = 0;
         this.acceleration = 0.2;
-        this.maxSpeed = 9;
+        this.maxSpeed = maxSpeed;
         this.minSpeed = -this.maxSpeed * 0.5;
         this.friction = 0.05;
         this.angle = 0;
@@ -25,8 +26,10 @@ class Car {
         this.corners = this.#findCorners();
         this.#updateCollision(roadBorders);
         this.#updateImageState();
-        console.hud(this);
-        console.hud(this.controls);
+        if (this.hud) {
+            this.hud.update(this);
+            this.hud.update(this.controls);
+        }
     }
 
     draw(ctx) {

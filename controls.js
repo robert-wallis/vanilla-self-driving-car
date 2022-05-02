@@ -13,10 +13,15 @@ class HumanControls extends Controls {
         super();
         this.keymap = {
             "ArrowUp":"gas",
+            "w":"gas",
             "ArrowDown":"brake",
+            "s":"brake",
             "ArrowLeft":"left",
+            "a":"left",
             "ArrowRight":"right",
+            "d":"right",
             "Escape":"reset",
+            "Esc":"reset",
         }
         this.#addKeyboardListeners();
     }
@@ -34,5 +39,12 @@ class HumanControls extends Controls {
                 this[controlName] = false;
             }
         })
+    }
+}
+
+class AIForwardControls extends Controls {
+    constructor() {
+        super();
+        this.gas = true;
     }
 }
