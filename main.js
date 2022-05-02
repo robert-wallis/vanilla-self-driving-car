@@ -24,7 +24,7 @@ cars.push(player);
 for (let i = 0; i < LANES - 1; i++) {
     const car = new Car({
         x: road.laneCenter(i),
-        y: canvas.height * 0.8,
+        y: canvas.height * 0.8 - 140,
         scale: 0.6,
         imageFilename: "van.png",
         controls: new AIForwardControls(),
@@ -53,7 +53,7 @@ function animate() {
     }
 
     cars.forEach(car => car.update(road.borders));
-    sensor.update(road.borders);
+    sensor.update(road.borders, cars);
 
     context.clearRect(0, 0, canvas.width, canvas.height);
     context.save();
