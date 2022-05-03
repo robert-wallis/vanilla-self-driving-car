@@ -1,16 +1,16 @@
 class Car {
-    constructor({x, y, scale, imageFilename, controls, maxSpeed=9, hud=null}) {
+    constructor({x, y, scale, imageFilename, controls, maxSpeed=9}) {
         this.x = x;
         this.y = y;
         this.scale = scale;
         this.controls = controls;
-        this.hud = hud;
 
         this.image = new Image();
         this.image.src = imageFilename;
         this.corners = [];
 
-        this.speed = 0;
+        this.speed = 9.0;
+        this.turnSpeed = 0.03;
         this.acceleration = 0.2;
         this.maxSpeed = maxSpeed;
         this.minSpeed = -this.maxSpeed * 0.5;
@@ -26,10 +26,6 @@ class Car {
         this.corners = this.#findCorners();
         this.#updateCollision(roadBorders);
         this.#updateImageState();
-        if (this.hud) {
-            this.hud.update(this);
-            this.hud.update(this.controls);
-        }
     }
 
     draw(ctx) {
@@ -101,16 +97,17 @@ class Car {
 
         // rotation update
         if (this.speed !== 0) {
-            const angleDelta = this.speed > 0 ? 0.03 : -0.03;
-            let newAngle = null;
+            const reversing = this.speed > 0 ? 1.0 : -1.0;
+            const turnDelta = this.turnSpeed * reversing;
+            let newAngle = 0;
             if (this.controls.right) {
-                newAngle = this.angle + angleDelta;
+                newAngle += turnDelta;
             }
             if (this.controls.left) {
-                newAngle = this.angle - angleDelta;
+                newAngle -= turnDelta;
             }
-            if (newAngle) {
-                this.angle = newAngle % (Math.PI * 2);
+            if (newAngle !== 0) {
+                this.angle = (this.angle + newAngle) % (Math.PI * 2.0);
             }
         }
 

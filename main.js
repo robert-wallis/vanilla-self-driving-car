@@ -55,6 +55,9 @@ function animate() {
     cars.forEach(car => car.update(road.borders));
     sensor.update(road.borders, cars);
 
+    hud.update(player);
+    hud.update(humanPlayer);
+
     context.clearRect(0, 0, canvas.width, canvas.height);
     context.save();
     context.translate(0, -player.y + canvas.height * 0.65);
