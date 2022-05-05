@@ -6,15 +6,17 @@ updateCanvasSize(); // get accurate canvas before laying out screen
 
 const hud = new Hud();
 const LANES = 5;
+const START_Y = 1000000;
 
 let road = new Road(canvas.width * 0.5, 500 * 0.9, LANES);
 let player = new Car({
     x: road.laneCenter(-1),
-    y: canvas.height * 0.8,
+    y: START_Y,
     scale: 0.6,
     imageFilename: "van.png",
     controls: humanPlayer,
     maxSpeed: 11,
+    initialSpeed: 9.05,
     hud: hud,
 });
 let sensor = new Sensor(player);
@@ -24,7 +26,7 @@ cars.push(player);
 for (let i = 0; i < LANES - 1; i++) {
     const car = new Car({
         x: road.laneCenter(i),
-        y: canvas.height * 0.8 - 140,
+        y: START_Y - 140,
         scale: 0.6,
         imageFilename: "van.png",
         controls: new AIForwardControls(),
