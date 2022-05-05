@@ -15,7 +15,7 @@ class Car {
         this.maxSpeed = maxSpeed;
         this.minSpeed = -this.maxSpeed * 0.5;
         this.friction = 0.05;
-        this.angle = 0;
+        this.angle = Math.PI;
         this.gear = "N";
         this.damaged = false;
     }
@@ -45,7 +45,7 @@ class Car {
         }
 
         ctx.translate(this.x, this.y);
-        ctx.rotate(this.angle);
+        ctx.rotate(-this.angle);
         ctx.drawImage(this.image, -width * 0.5, -height * 0.5, width, height);
 
         ctx.restore();
@@ -101,10 +101,10 @@ class Car {
             const turnDelta = this.turnSpeed * reversing;
             let newAngle = 0;
             if (this.controls.right) {
-                newAngle += turnDelta;
+                newAngle -= turnDelta;
             }
             if (this.controls.left) {
-                newAngle -= turnDelta;
+                newAngle += turnDelta;
             }
             if (newAngle !== 0) {
                 this.angle = (this.angle + newAngle) % (Math.PI * 2.0);
@@ -113,7 +113,7 @@ class Car {
 
         // position update
         this.x += Math.sin(this.angle) * this.speed;
-        this.y -= Math.cos(this.angle) * this.speed; // y starts at top so subtract
+        this.y += Math.cos(this.angle) * this.speed;
     }
 
     #updateCollision(roadBorders) {
@@ -147,20 +147,20 @@ class Car {
         const a = Math.atan2(this.image.width, this.image.height);
         const rs = radius * this.scale * 0.9;
         corners.push({
-            x: this.x + Math.sin(-this.angle + a) * rs,
-            y: this.y + Math.cos(-this.angle + a) * rs
+            x: this.x + Math.sin(this.angle + a) * rs,
+            y: this.y + Math.cos(this.angle + a) * rs
         });
         corners.push({
-            x: this.x + Math.sin(-this.angle - a) * rs,
-            y: this.y + Math.cos(-this.angle - a) * rs
+            x: this.x + Math.sin(this.angle - a) * rs,
+            y: this.y + Math.cos(this.angle - a) * rs
         });
         corners.push({
-            x: this.x + Math.sin(-this.angle + a + Math.PI) * rs,
-            y: this.y + Math.cos(-this.angle + a + Math.PI) * rs
+            x: this.x + Math.sin(this.angle + a + Math.PI) * rs,
+            y: this.y + Math.cos(this.angle + a + Math.PI) * rs
         });
         corners.push({
-            x: this.x + Math.sin(-this.angle - a - Math.PI) * rs,
-            y: this.y + Math.cos(-this.angle - a - Math.PI) * rs
+            x: this.x + Math.sin(this.angle - a - Math.PI) * rs,
+            y: this.y + Math.cos(this.angle - a - Math.PI) * rs
         });
         return corners;
     }
