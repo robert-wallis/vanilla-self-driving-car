@@ -48,3 +48,23 @@ class AIForwardControls extends Controls {
         this.gas = true;
     }
 }
+
+class AutopilotControls extends HumanControls {
+    constructor() {
+        super();
+        this.autopilot = true;
+    }
+
+    // outputs.0 = gas
+    // outputs.1 = brake
+    // outputs.2 = left
+    // outputs.3 = right
+    updateAI(outputs) {
+        if (this.autopilot) {
+            this.gas = outputs[0] === 1;
+            this.brake = outputs[1] === 1;
+            this.left = outputs[2] === 1;
+            this.right = outputs[3] === 1;
+        }
+    }
+}

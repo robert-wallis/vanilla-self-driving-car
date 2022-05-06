@@ -6,12 +6,11 @@ class NeuralNetwork {
         }
     }
 
-    static feedForward(network, givenInputs) {
-        let outputs = NNLayer.feedForward(givenInputs, network.layers[0]);
-        for (let i = 1; i < network.layers.length; i++) {
-            outputs = NNLayer.feedForward(outputs, netowrk.layers[i]);
-        }
-        return outputs;
+    feedForward(givenInputs) {
+        return this.layers.reduce(
+            (outputs, layer) => layer.feedForward(outputs),
+            givenInputs
+        );
     }
 }
 
@@ -37,18 +36,18 @@ class NNLayer {
         layer.biases = layer.biases.map(_ => Math.random() * 2 - 1);
     }
 
-    static feedForward(layer, givenInputs) {
-        for (let i = 0; i < layer.inputs.length; i++) {
-            layer.inputs[i] = givenInputs[i];
+    feedForward(givenInputs) {
+        for (let i = 0; i < this.inputs.length; i++) {
+            this.inputs[i] = givenInputs[i];
         }
-        for (let o = 0; o < layer.outputs.length; o++) {
+        for (let o = 0; o < this.outputs.length; o++) {
             let sum = 0.0;
-            for (let i = 0; i < layer.inputs.length; i++) {
-                sum += layer.inputs[i] * layer.weight[i][o];
+            for (let i = 0; i < this.inputs.length; i++) {
+                sum += this.inputs[i] * this.weights[i][o];
             }
             // if the input is large enough, then activate the output
-            layer.outputs[o] = sum > layer.biases[o] ? 1.0 : 0.0;
+            this.outputs[o] = sum > this.biases[o] ? 1.0 : 0.0;
         }
-        return layer.outputs;
+        return this.outputs;
     }
 }

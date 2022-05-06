@@ -1,6 +1,5 @@
 const canvas = document.getElementById("canvas");
 const context = canvas.getContext("2d");
-const humanPlayer = new HumanControls();
 
 updateCanvasSize(); // get accurate canvas before laying out screen
 
@@ -9,6 +8,8 @@ const LANES = 5;
 const START_Y = 1000000;
 
 let road = new Road(canvas.width * 0.5, 500 * 0.9, LANES);
+
+const humanPlayer = new AutopilotControls();
 let player = new Car({
     x: road.laneCenter(-1),
     y: START_Y,
@@ -20,6 +21,7 @@ let player = new Car({
     hud: hud,
 });
 let sensor = new Sensor(player);
+const brain = new NeuralNetwork([sensor.rayCount, 6, 4]);
 
 let cars = [];
 cars.push(player);
@@ -58,8 +60,12 @@ function animate() {
     // physics ---------------------------------------------------------------
     cars.forEach(car => car.update(road.borders, cars));
     sensor.update(road.borders, cars);
+    const offsets = sensor.readings.map(s => s === null ? 0.0 : 1.0 - s.offset);
+    const outputs = brain.feedForward(offsets);
+    humanPlayer.updateAI(outputs);
 
     // view ------------------------------------------------------------------
+    hud.update({brain0: outputs[0], brain1: outputs[1], brain2: outputs[2], brain3: outputs[3]});
     hud.update(player);
     hud.update(humanPlayer);
     context.clearRect(0, 0, canvas.width, canvas.height);
