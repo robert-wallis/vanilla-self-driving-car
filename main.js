@@ -54,7 +54,7 @@ function animate() {
         window.location.href = window.location.href;
     }
 
-    cars.forEach(car => car.update(road.borders));
+    cars.forEach(car => car.update(road.borders, cars));
     sensor.update(road.borders, cars);
 
     hud.update(player);

@@ -20,11 +20,11 @@ class Car {
         this.damaged = false;
     }
 
-    update(roadBorders) {
+    update(roadBorders, cars) {
         this.#updateInput();
         this.#updatePhysics();
         this.corners = this.#findCorners();
-        this.#updateCollision(roadBorders);
+        this.#updateCollision(roadBorders, cars);
         this.#updateImageState();
     }
 
@@ -116,15 +116,21 @@ class Car {
         this.y += Math.cos(this.angle) * this.speed;
     }
 
-    #updateCollision(roadBorders) {
-        let damaged = false;
-        for (let i = 0; i < roadBorders.length; i++) {
-            if (polysIntersect(this.corners, roadBorders[i])) {
-                damaged = true;
-                break;
-            }
+    #updateCollision(roadBorders, cars) {
+        let borderHit = roadBorders.find(
+            border => polysIntersect(this.corners, border)
+        );
+        if (borderHit) {
+            this.damaged = true;
+            return;
         }
-        this.damaged = damaged;
+        let carHit = cars.find(
+            car => car !== this && polysIntersect(this.corners, car.corners)
+        );
+        if (carHit) {
+            this.damaged = true;
+            carHit.damaged = true;
+        }
     }
 
     #updateImageState() {
