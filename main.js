@@ -49,23 +49,26 @@ function updateCanvasSize() {
 }
 
 function animate() {
+    // input -----------------------------------------------------------------
     if (humanPlayer.reset) {
         // noinspection SillyAssignmentJS
         window.location.href = window.location.href;
     }
 
+    // physics ---------------------------------------------------------------
     cars.forEach(car => car.update(road.borders, cars));
     sensor.update(road.borders, cars);
 
+    // view ------------------------------------------------------------------
     hud.update(player);
     hud.update(humanPlayer);
-
     context.clearRect(0, 0, canvas.width, canvas.height);
     context.save();
+
+    // camera
     context.translate(-player.x + canvas.width * 0.5, -player.y + canvas.height * 0.65);
 
     road.draw(context);
-
     cars.forEach(car => car.draw(context));
     sensor.draw(context);
 
