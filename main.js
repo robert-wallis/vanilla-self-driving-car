@@ -62,7 +62,7 @@ function animate() {
 
     context.clearRect(0, 0, canvas.width, canvas.height);
     context.save();
-    context.translate(0, -player.y + canvas.height * 0.65);
+    context.translate(-player.x + canvas.width * 0.5, -player.y + canvas.height * 0.65);
 
     road.draw(context);
 
