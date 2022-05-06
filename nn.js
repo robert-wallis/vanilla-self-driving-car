@@ -1,3 +1,20 @@
+class NeuralNetwork {
+    constructor(neuronCounts) {
+        this.layers = [];
+        for (let i = 0; i < neuronCounts.length - 1; i++) {
+            this.layers.push(new NNLayer(neuronCounts[i], neuronCounts[i + 1]));
+        }
+    }
+
+    static feedForward(network, givenInputs) {
+        let outputs = NNLayer.feedForward(givenInputs, network.layers[0]);
+        for (let i = 1; i < network.layers.length; i++) {
+            outputs = NNLayer.feedForward(outputs, netowrk.layers[i]);
+        }
+        return outputs;
+    }
+}
+
 class NNLayer {
     constructor(inputCount = 5, outputCount = 5) {
         this.inputs = new Float32Array(inputCount);
