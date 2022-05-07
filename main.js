@@ -65,7 +65,7 @@ function animate() {
     humanPlayer.updateAI(outputs);
 
     // view ------------------------------------------------------------------
-    hud.update({brain0: outputs[0], brain1: outputs[1], brain2: outputs[2], brain3: outputs[3]});
+    hud.update({ brain0: outputs[0], brain1: outputs[1], brain2: outputs[2], brain3: outputs[3] });
     hud.update(player);
     hud.update(humanPlayer);
     context.clearRect(0, 0, canvas.width, canvas.height);

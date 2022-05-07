@@ -1,5 +1,5 @@
 class Car {
-    constructor({x, y, scale, imageFilename, controls, maxSpeed = 9, initialSpeed = 9}) {
+    constructor({ x, y, scale, imageFilename, controls, maxSpeed = 9, initialSpeed = 9 }) {
         this.x = x;
         this.y = y;
         this.scale = scale;

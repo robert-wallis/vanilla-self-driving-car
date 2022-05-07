@@ -12,16 +12,16 @@ class HumanControls extends Controls {
     constructor() {
         super();
         this.keymap = {
-            "ArrowUp":"gas",
-            "w":"gas",
-            "ArrowDown":"brake",
-            "s":"brake",
-            "ArrowLeft":"left",
-            "a":"left",
-            "ArrowRight":"right",
-            "d":"right",
-            "Escape":"reset",
-            "Esc":"reset",
+            "ArrowUp": "gas",
+            "w": "gas",
+            "ArrowDown": "brake",
+            "s": "brake",
+            "ArrowLeft": "left",
+            "a": "left",
+            "ArrowRight": "right",
+            "d": "right",
+            "Escape": "reset",
+            "Esc": "reset",
         }
         this.#addKeyboardListeners();
     }

@@ -11,8 +11,8 @@ class Road {
         this.bottom = 1000000;
 
         this.borders = [
-            [{x: this.left, y: this.top}, {x: this.left, y: this.bottom}],
-            [{x: this.right, y: this.top}, {x: this.right, y: this.bottom}]
+            [{ x: this.left, y: this.top }, { x: this.left, y: this.bottom }],
+            [{ x: this.right, y: this.top }, { x: this.right, y: this.bottom }]
         ];
     }
 
