@@ -5,7 +5,7 @@ updateCanvasSize(); // get accurate canvas before laying out screen
 
 const hud = new Hud();
 const LANES = 5;
-const START_Y = 1000000;
+const START_Y = 900000;
 
 let road = new Road(canvas.width * 0.5, 500 * 0.9, LANES);
 
@@ -21,7 +21,8 @@ let player = new Car({
     hud: hud,
 });
 let sensor = new Sensor(player);
-const brain = new NeuralNetwork([sensor.rayCount, 6, 4]);
+const brain = new NeuralNetwork([sensor.rayCount, 6, ['gas', 'brake', 'left', 'right']]);
+const nnVisualizer = new NNVisualizer(brain);
 
 let cars = [];
 cars.push(player);
@@ -65,7 +66,6 @@ function animate() {
     humanPlayer.updateAI(outputs);
 
     // view ------------------------------------------------------------------
-    hud.update({ brain0: outputs[0], brain1: outputs[1], brain2: outputs[2], brain3: outputs[3] });
     hud.update(player);
     hud.update(humanPlayer);
     context.clearRect(0, 0, canvas.width, canvas.height);
@@ -79,6 +79,7 @@ function animate() {
     sensor.draw(context);
 
     context.restore();
+    nnVisualizer.update(context, {x: 50, y: 50, width: canvas.width-300, height: canvas.height * 0.6 - 100});
 
     requestAnimationFrame(animate);
 }
