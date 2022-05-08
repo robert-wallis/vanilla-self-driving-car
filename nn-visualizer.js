@@ -39,34 +39,41 @@ class NNVisualizer {
 	drawInputLayer(ctx, layer, rect) {
 		const radius = this.nodeSize * 0.5;
 
+		ctx.save()
 		for (let i = 0; i < layer.weights.length; i++) {
 			for (let o = 0; o < layer.weights[i].length; o++) {
 				const value = layer.weights[i][o];
 				const xInput = rect.x + radius;
-				const xBias = rect.x + rect.width - radius;
+				const xOutput = rect.x + rect.width + radius;
 				const yInput = lerp(rect.y + radius, rect.y + rect.height - radius, i / (layer.inputs.length - 1));
-				const yBias = lerp(rect.y + radius, rect.y + rect.height - radius, o / (layer.biases.length - 1));
+				const yOutput = lerp(rect.y + radius, rect.y + rect.height - radius, o / (layer.biases.length - 1));
 				ctx.beginPath();
 				ctx.moveTo(xInput, yInput);
-				ctx.lineTo(xBias, yBias);
+				ctx.lineTo(xOutput, yOutput);
 				ctx.lineWidth = 2;
-				ctx.strokeStyle = oneOneToColor(value);
+				ctx.strokeStyle = weightColor(value, layer.biases[o]);
 				ctx.stroke();
 			}
 		}
+		ctx.restore()
 
 		for (let i = 0; i < layer.inputs.length; i++) {
 			const input = layer.inputs[i];
 			const x = rect.x + radius;
 			const y = lerp(rect.y + radius, rect.y + rect.height - radius, i / (layer.inputs.length - 1));
-			this.#drawNode(ctx, x, y, percentToColor(input), i, input.toFixed(2));
+			this.#drawNode(ctx, x, y, inputColor(input), i, input.toFixed(2));
 		}
 
 		for (let i = 0; i < layer.biases.length; i++) {
 			const bias = layer.biases[i];
-			const x = rect.x + rect.width - radius;
+			const x = rect.x + rect.width + radius;
 			const y = lerp(rect.y + radius, rect.y + rect.height - radius, i / (layer.biases.length - 1));
-			this.#drawNode(ctx, x, y, oneOneToColor(bias), i, bias.toFixed(2));
+			ctx.save()
+			ctx.beginPath()
+			ctx.arc(x, y, radius * 1.2, 0, Math.PI * 2);
+			ctx.strokeStyle = biasColor(bias);
+			ctx.stroke();
+			ctx.restore();
 		}
 	}
 
@@ -77,13 +84,14 @@ class NNVisualizer {
 			const output = this.nn.outputs[i];
 			const x = rect.x + rect.width - radius;
 			const y = lerp(rect.y + radius, rect.y + rect.height - radius, i / (outputsLength - 1));
-			this.#drawNode(ctx, x, y, percentToColor(output), this.nn.labels[i], output.toFixed(2));
+			this.#drawNode(ctx, x, y, outputColor(output), this.nn.labels[i], output.toFixed(2));
 		}
 	}
 
 	#drawNode(ctx, x, y, color, label, subscript) {
 		const radius = this.nodeSize * 0.5;
-		ctx.beginPath()
+		ctx.save();
+		ctx.beginPath();
 		ctx.arc(x, y, radius, 0, Math.PI * 2);
 		ctx.fillStyle = color;
 		ctx.fill();
@@ -103,16 +111,46 @@ class NNVisualizer {
 			ctx.font = '10px sans-serif';
 			ctx.fillText(subscript, x, y + this.nodeSize);
 		}
+		ctx.restore();
 	}
 }
 
-function oneOneToColor(value) {
-	return percentToColor((value + 1.0) * 0.5);
+function inputColor(input) {
+	return percentToColor(input);
+}
+
+function weightColor(weight, bias) {
+	let value = (weight + 1.0) * 0.5;
+	const l = 20 + ((bias + 1.0) * 0.5 * 120);
+	const c = 300;
+	const fromH = 20;
+	const toH = 250;
+
+	const h = fromH + (toH - fromH) * value;
+	let [r, g, b] = LCHToRGB([l,c,h]);
+	r = Math.floor(r*100);
+	g = Math.floor(g*100);
+	b = Math.floor(b*100);
+	return 'rgb(' + r + ' ' + g + ' ' + b + ')';
+}
+
+function biasColor(bias) {
+	let v = Math.floor(((bias + 1.0) * 0.5) * 100);
+	return 'hsl(0 0% ' + v + '%)';
+}
+
+function outputColor(output) {
+	return percentToColor(output);
 }
 
 function percentToColor(value) {
-	const r = Math.floor((value) * 100);
-	const g = 20;
-	const b = Math.floor((1 - value) * 100);
-	return 'rgb(' + r + '% ' + g + '% ' + b + '%)';
+	const l = 180;
+	const c = 300 * value;
+	const h = 70;
+
+	let [r, g, b] = LCHToRGB([l,c,h]);
+	r = Math.floor(r*100);
+	g = Math.floor(g*100);
+	b = Math.floor(b*100);
+	return 'rgb(' + r + ' ' + g + ' ' + b + ')';
 }

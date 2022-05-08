@@ -14,3 +14,4 @@ globals:
   - Sensor
   - NeuralNetwork
   - NNVisualizer
+  - LCHToRGB
