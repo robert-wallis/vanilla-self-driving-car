@@ -80,7 +80,7 @@ function animate() {
     sensor.draw(context);
 
     context.restore();
-    nnVisualizer.update(context, {x: 50, y: 50, width: canvas.width-300, height: canvas.height * 0.6 - 100});
+    nnVisualizer.update(context, {x: 50, y: 50, width: canvas.width - 100, height: canvas.height * 0.6 - 200});
 
     requestAnimationFrame(animate);
 }
