@@ -11,7 +11,7 @@ let road = new Road(canvas.width * 0.5, 500 * 0.9, LANES);
 
 const humanPlayer = new AutopilotControls();
 let player = new Car({
-    x: road.laneCenter(-1),
+    x: road.laneCenter(2),
     y: START_Y,
     scale: 0.6,
     imageFilename: "van.png",
@@ -21,7 +21,7 @@ let player = new Car({
     hud: hud,
 });
 let sensor = new Sensor(player);
-const brain = new NeuralNetwork([sensor.rayCount, 6, ['gas', 'brake', 'left', 'right']]);
+const brain = new NeuralNetwork([sensor.rayCount + 1, 6, ['gas', 'brake', 'left', 'right']]);
 const nnVisualizer = new NNVisualizer(brain);
 
 let cars = [];
@@ -29,7 +29,7 @@ cars.push(player);
 for (let i = 0; i < LANES - 1; i++) {
     const car = new Car({
         x: road.laneCenter(i),
-        y: START_Y - 140,
+        y: START_Y - 300,
         scale: 0.6,
         imageFilename: "van.png",
         controls: new AIForwardControls(),
@@ -61,8 +61,9 @@ function animate() {
     // physics ---------------------------------------------------------------
     cars.forEach(car => car.update(road.borders, cars));
     sensor.update(road.borders, cars);
-    const offsets = sensor.readings.map(s => s === null ? 0.0 : 1.0 - s.offset);
-    const outputs = brain.feedForward(offsets);
+    const inputs = sensor.readings.map(s => s === null ? 0.0 : 1.0 - s.offset);
+    inputs.push(player.speed / player.maxSpeed);
+    const outputs = brain.feedForward(inputs);
     humanPlayer.updateAI(outputs);
 
     // view ------------------------------------------------------------------
