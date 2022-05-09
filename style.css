@@ -22,7 +22,14 @@ body {
     width: 100%;
     height: 100%;
 }
+a {
+    color: rgb(0, 187, 255)
+}
+a:visited {
+    color: rgb(22, 130, 169)
+}
 #hud {
+    text-align: right;
     position: fixed;
     padding: 1rem;
     bottom: 1rem;
@@ -33,7 +40,14 @@ body {
     color: #FFFFFF;
     font: 1em sans-serif;
 }
+#hud td {
+    width: 50%;
+}
 #hud tr > td:first-child {
     text-align: right;
     color: #888888;
+}
+#hud tr > td:nth-child(2) {
+    text-align: left;
+    color: #FFFFFF;
 }
