@@ -48,40 +48,10 @@ let scientificMode = labelInputLoad("scientific", false);
 let scientificIterations = 1;
 let bots = [];
 let npcCount = labelInputLoad("npcCount", 100);
-for (let i = 0; i < npcCount; i++) {
-    let brain;
-    if (i == 0) {
-        brain = loadBest();
-        if (!brain) {
-            mutateAmount = 1.0;
-            brain = NeuralNetwork.initRandom([RAY_COUNT + 1, RAY_COUNT + 2, 4], ['gas', 'brake', 'left', 'right']);
-        }
-        if (scientificMode) {
-            let brainSize = brain.countNetworkSize();
-            scientificIterations = Math.max(1, Math.floor(npcCount / brainSize));
-            npcCount = brainSize * scientificIterations;
-            labelInputSave("npcCount", npcCount);
-        }
-    } else {
-        brain = NeuralNetwork.initDeserialize(bots[0].brain);
-        if (scientificMode) {
-            // i - 1 because 0 is the original car, and 0 is the first weight too
-            brain.mutateScientifically(i - 1, mutateAmount * 2 - 1, 0.5 / (i % scientificIterations));
-        } else {
-            brain.mutateWeightsAndBiases(mutateAmount);
-        }
-    }
-    const car = new Car({
-        x: road.laneCenter(2),
-        y: START_Y,
-        scale: 0.6,
-        imageFilename: "van.png",
-        maxSpeed: 11,
-    });
-    const controls = new NNControls(car, brain, RAY_COUNT, Math.PI * 0.25);
-    bots.push(controls);
-}
-let bestBot = bots[0];
+
+let bestBot = makeFirstBot();
+bots.push(bestBot);
+addBots(bots, bestBot, npcCount - 1);
 
 window.addEventListener("resize", updateCanvasSize);
 animate();
@@ -137,6 +107,7 @@ function animate() {
     bestBot = bots.reduce((best, bot) => {
         return bot.car.y < best.car.y ? bot : best;
     }, bots[0]);
+    bots = cullBots(bots, bestBot);
 
     // view ------------------------------------------------------------------
     hud.update({
@@ -166,4 +137,55 @@ function animate() {
     }
 
     requestAnimationFrame(animate);
+}
+
+function addBots(bots, botPrototype, count) {
+    for (let i = 0; i < count; i++) {
+        let brain = NeuralNetwork.initDeserialize(botPrototype.brain);
+        if (scientificMode) {
+            // i - 1 because 0 is the original car, and 0 is the first weight too
+            brain.mutateScientifically(i - 1, mutateAmount * 2 - 1, 0.5 / (i % scientificIterations));
+        } else {
+            brain.mutateWeightsAndBiases(mutateAmount);
+        }
+        bots.push(cloneBotWithNewBrain(botPrototype, brain));
+    }
+}
+
+function makeFirstBot() {
+    let brain = loadBest();
+    if (!brain) {
+        mutateAmount = 1.0;
+        brain = NeuralNetwork.initRandom([RAY_COUNT + 1, RAY_COUNT + 2, 4], ['gas', 'brake', 'left', 'right']);
+    }
+    if (scientificMode) {
+        let brainSize = brain.countNetworkSize();
+        scientificIterations = Math.max(1, Math.floor(npcCount / brainSize));
+        npcCount = brainSize * scientificIterations;
+        labelInputSave("npcCount", npcCount);
+    }
+    const car = new Car({
+        x: road.laneCenter(2),
+        y: START_Y,
+        scale: 0.6,
+        imageFilename: "van.png",
+        maxSpeed: 11,
+    });
+    return new NNControls(car, brain, RAY_COUNT, Math.PI * 0.25);
+}
+
+function cloneBotWithNewBrain(original, newBrain) {
+    const car = Object.assign(new Car({
+        x: road.laneCenter(2),
+        y: START_Y,
+        scale: 0.6,
+        imageFilename: "van.png",
+        maxSpeed: 11,
+    }), original.car);
+    const bot = new NNControls(car, newBrain, RAY_COUNT, Math.PI * 0.25);
+    return bot;
+}
+
+function cullBots(bots, bestBot) {
+    return bots.filter(bot => bot.car.y < (bestBot.car.y + 1000));
 }
