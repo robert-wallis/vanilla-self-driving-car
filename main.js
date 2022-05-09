@@ -14,31 +14,33 @@ const nnVisualizer = new NNVisualizer();
 
 let npcs = [];
 let npcCars = [];
-function makeWave(wave, yOffset) {
-    for (let i = 0; i < wave.length; i++) {
-        if (!wave[i])
-            continue;
-        const car = new Car({
-            x: road.laneCenter(i),
-            y: START_Y - yOffset,
-            scale: 0.6,
-            imageFilename: "van.png",
-            maxSpeed: 9,
-        });
-        const controls = new AIForwardControls(car);
-        npcs.push(controls);
-        npcCars.push(car);
+{
+    function makeWave(wave, yOffset) {
+        for (let i = 0; i < wave.length; i++) {
+            if (!wave[i])
+                continue;
+            const car = new Car({
+                x: road.laneCenter(i),
+                y: START_Y - yOffset,
+                scale: 0.6,
+                imageFilename: "van.png",
+                maxSpeed: 8,
+            });
+            const controls = new AIForwardControls(car);
+            npcs.push(controls);
+            npcCars.push(car);
+        }
     }
+    let yOffset = 0;
+    makeWave([true, false, true, true, true], yOffset += 500);
+    makeWave([true, true, false, true, true], yOffset += 300);
+    makeWave([true, true, false, true, true], yOffset += 300);
+    makeWave([false, true, true, true, true], yOffset += 330);
+    makeWave([true, true, true, false, true], yOffset += 350);
+    makeWave([true, true, false, true, true], yOffset += 300);
+    makeWave([true, true, true, true, false], yOffset += 300);
+    makeWave([false, true, true, true, true], yOffset += 300);
 }
-let yOffset = 0;
-makeWave([true, false, true, true, true], yOffset+=500);
-makeWave([true, true, false, true, true], yOffset+=300);
-makeWave([true, true, false, true, true], yOffset+=300);
-makeWave([false, true, true, true, true], yOffset+=330);
-makeWave([true, true, true, false, true], yOffset+=350);
-makeWave([true, true, false, true, true], yOffset+=300);
-makeWave([true, true, true, true, false], yOffset+=300);
-makeWave([false, true, true, true, true], yOffset+=300);
 
 let viewNetwork = labelInputLoad("viewNetwork", false);
 let mutateAmount = labelInputLoad("mutateAmount", 0.1);
@@ -151,16 +153,16 @@ function animate() {
     road.draw(context);
     npcs.forEach(npc => npc.car.draw(context));
 
-    context.globalAlpha=0.2;
+    context.globalAlpha = 0.2;
     bots.forEach(bot => bot.car.draw(context));
-    context.globalAlpha=1.0;
+    context.globalAlpha = 1.0;
     bestBot.car.draw(context);
 
     bestBot.sensor.draw(context);
 
     context.restore();
     if (localStorage.viewNetwork == 'true') {
-        nnVisualizer.update(context, {x: 50, y: 50, width: canvas.width - 100, height: canvas.height * 0.6 - 200}, bestBot.brain);
+        nnVisualizer.update(context, { x: 50, y: 50, width: canvas.width - 100, height: canvas.height * 0.6 - 200 }, bestBot.brain);
     }
 
     requestAnimationFrame(animate);
