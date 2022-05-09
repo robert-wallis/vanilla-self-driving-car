@@ -1,9 +1,9 @@
 class Sensor {
-    constructor(car, rayCount) {
+    constructor(car, rayCount, raySpread) {
         this.car = car;
         this.rayCount = rayCount;
         this.rayLength = 300;
-        this.raySpread = Math.PI / 2;
+        this.raySpread = raySpread;
         this.rays = [];
         this.readings = [];
     }
@@ -29,14 +29,14 @@ class Sensor {
 
             ctx.beginPath();
             ctx.lineWidth = 2;
-            ctx.strokeStyle = "#c0a00c";
+            ctx.strokeStyle = "#c0a00c80";
             ctx.moveTo(start.x, start.y);
             ctx.lineTo(end.x, end.y);
             ctx.stroke();
 
             ctx.beginPath();
             ctx.lineWidth = 2;
-            ctx.strokeStyle = "#ff0000";
+            ctx.strokeStyle = "#ff000080";
             ctx.moveTo(ray[1].x, ray[1].y);
             ctx.lineTo(end.x, end.y);
             ctx.stroke();

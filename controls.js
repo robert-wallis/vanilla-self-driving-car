@@ -56,10 +56,10 @@ class AIForwardControls extends Controls {
 }
 
 class NNControls extends Controls {
-    constructor(car, brain=null, rayCount=5) {
+    constructor(car, brain=null, rayCount, raySpread) {
         super();
         this.car = car;
-        this.sensor = new Sensor(car, rayCount);
+        this.sensor = new Sensor(car, rayCount, raySpread);
         this.brain = brain;
     }
 
