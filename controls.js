@@ -43,28 +43,34 @@ class HumanControls extends Controls {
 }
 
 class AIForwardControls extends Controls {
-    constructor() {
+    constructor(car) {
         super();
+        this.car = car;
         this.gas = true;
+    }
+
+    update(borders, npcs) {
+        this.car.update(this, borders, npcs);
     }
 }
 
-class AutopilotControls extends HumanControls {
-    constructor() {
+class NNControls extends Controls {
+    constructor(car) {
         super();
-        this.autopilot = true;
+        this.car = car;
+        this.sensor = new Sensor(car);
+        this.brain = new NeuralNetwork([this.sensor.rayCount + 1, 6, ['gas', 'brake', 'left', 'right']]);
     }
 
-    // outputs.0 = gas
-    // outputs.1 = brake
-    // outputs.2 = left
-    // outputs.3 = right
-    updateAI(outputs) {
-        if (this.autopilot) {
-            this.gas = outputs[0] === 1;
-            this.brake = outputs[1] === 1;
-            this.left = outputs[2] === 1;
-            this.right = outputs[3] === 1;
-        }
+    update(borders, npcs) {
+        this.sensor.update(borders, npcs);
+        const inputs = this.sensor.readings.map(s => s === null ? 0.0 : 1.0 - s.offset);
+        inputs.push(this.car.speed / this.car.maxSpeed);
+        const outputs = this.brain.feedForward(inputs);
+        this.gas = outputs[0] === 1;
+        this.brake = outputs[1] === 1;
+        this.left = outputs[2] === 1;
+        this.right = outputs[3] === 1;
+        this.car.update(this, borders, npcs);
     }
 }

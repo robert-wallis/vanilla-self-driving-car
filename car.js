@@ -1,9 +1,8 @@
 class Car {
-    constructor({ x, y, scale, imageFilename, controls, maxSpeed = 9, initialSpeed = 9 }) {
+    constructor({ x, y, scale, imageFilename, maxSpeed = 9, initialSpeed = 9 }) {
         this.x = x;
         this.y = y;
         this.scale = scale;
-        this.controls = controls;
 
         this.image = new Image();
         this.image.src = imageFilename;
@@ -20,12 +19,12 @@ class Car {
         this.damaged = false;
     }
 
-    update(roadBorders, cars) {
-        this.#updateInput();
-        this.#updatePhysics();
+    update(controls, roadBorders, cars) {
+        this.#updateInput(controls);
+        this.#updatePhysics(controls);
         this.corners = this.#findCorners();
         this.#updateCollision(roadBorders, cars);
-        this.#updateImageState();
+        this.#updateImageState(controls);
     }
 
     draw(ctx) {
@@ -51,17 +50,17 @@ class Car {
         ctx.restore();
     }
 
-    #updateInput() {
+    #updateInput(controls) {
         // input
-        if (this.controls.gas) {
+        if (controls.gas) {
             this.speed += this.acceleration;
         }
-        if (this.controls.brake) {
+        if (controls.brake) {
             this.speed -= this.acceleration;
         }
     }
 
-    #updatePhysics() {
+    #updatePhysics(controls) {
         if (this.damaged) {
             this.speed = 0;
             return;
@@ -106,10 +105,10 @@ class Car {
             const reversing = this.speed > 0 ? 1.0 : -1.0;
             const turnDelta = this.turnSpeed * reversing;
             let newAngle = 0;
-            if (this.controls.right) {
+            if (controls.right) {
                 newAngle -= turnDelta;
             }
-            if (this.controls.left) {
+            if (controls.left) {
                 newAngle += turnDelta;
             }
             if (newAngle !== 0) {
@@ -135,14 +134,15 @@ class Car {
         );
         if (carHit) {
             this.damaged = true;
-            carHit.damaged = true;
+            // don't damage other car, so that we can run multiple AIs against the NPCs
+            // carHit.damaged = true;
         }
     }
 
-    #updateImageState() {
+    #updateImageState(controls) {
         let src = "van.png";
         if (this.gear === "D") {
-            if (this.controls.brake) {
+            if (controls.brake) {
                 src = "van_D_brake.png";
             }
         } else if (this.gear === "R") {

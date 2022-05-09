@@ -1,17 +1,17 @@
 class NNVisualizer {
-	constructor(nn) {
-		this.nn = nn;
+	constructor() {
 		this.nodeSize = 30;
 	}
 
-	update(ctx, rect) {
-		this.drawInputLayers(ctx, {
+	update(ctx, rect, nn) {
+		this.nn = nn;
+		this.#drawInputLayers(ctx, {
 			x: rect.x,
 			y: rect.y,
 			width: rect.width - this.nodeSize,
 			height: rect.height,
 		});
-		this.drawOutputs(ctx, {
+		this.#drawOutputs(ctx, {
 			x: rect.x + rect.width - this.nodeSize,
 			y: rect.y,
 			width: this.nodeSize,
@@ -19,7 +19,7 @@ class NNVisualizer {
 		});
 	}
 
-	drawInputLayers(ctx, rect) {
+	#drawInputLayers(ctx, rect) {
 		const layerCount = this.nn.layers.length;
 		const layerWidth = rect.width / layerCount;
 
@@ -32,11 +32,11 @@ class NNVisualizer {
 				width: layerWidth,
 				height: rect.height
 			};
-			this.drawInputLayer(ctx, layer, layerRect);
+			this.#drawInputLayer(ctx, layer, layerRect);
 		}
 	}
 
-	drawInputLayer(ctx, layer, rect) {
+	#drawInputLayer(ctx, layer, rect) {
 		const radius = this.nodeSize * 0.5;
 
 		ctx.save()
@@ -77,7 +77,7 @@ class NNVisualizer {
 		}
 	}
 
-	drawOutputs(ctx, rect) {
+	#drawOutputs(ctx, rect) {
 		const radius = this.nodeSize * 0.5;
 		const outputsLength = this.nn.outputs.length;
 		for (let i = 0; i < outputsLength; i++) {

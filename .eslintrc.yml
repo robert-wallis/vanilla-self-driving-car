@@ -10,6 +10,7 @@ globals:
   - Road
   - AutopilotControls
   - AIForwardControls
+  - NNControls
   - Car
   - Sensor
   - NeuralNetwork

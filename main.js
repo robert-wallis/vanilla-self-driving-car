@@ -7,35 +7,36 @@ const hud = new Hud();
 const LANES = 5;
 const START_Y = 900000;
 
+let humanPlayer = new HumanControls();
 let road = new Road(canvas.width * 0.5, 500 * 0.9, LANES);
+const nnVisualizer = new NNVisualizer();
 
-const humanPlayer = new AutopilotControls();
-let player = new Car({
-    x: road.laneCenter(2),
-    y: START_Y,
-    scale: 0.6,
-    imageFilename: "van.png",
-    controls: humanPlayer,
-    maxSpeed: 11,
-    initialSpeed: 9.05,
-    hud: hud,
-});
-let sensor = new Sensor(player);
-const brain = new NeuralNetwork([sensor.rayCount + 1, 6, ['gas', 'brake', 'left', 'right']]);
-const nnVisualizer = new NNVisualizer(brain);
-
-let cars = [];
-cars.push(player);
+let npcs = [];
+let npcCars = [];
 for (let i = 0; i < LANES - 1; i++) {
     const car = new Car({
         x: road.laneCenter(i),
         y: START_Y - 300,
         scale: 0.6,
         imageFilename: "van.png",
-        controls: new AIForwardControls(),
         maxSpeed: 9,
     });
-    cars.push(car);
+    const controls = new AIForwardControls(car);
+    npcs.push(controls);
+    npcCars.push(car);
+}
+
+let bots = [];
+for (let i = 0; i < 100; i++) {
+    const car = new Car({
+        x: road.laneCenter(2),
+        y: START_Y,
+        scale: 0.6,
+        imageFilename: "van.png",
+        maxSpeed: 11,
+    });
+    const controls = new NNControls(car);
+    bots.push(controls);
 }
 
 window.addEventListener("resize", updateCanvasSize);
@@ -59,28 +60,29 @@ function animate() {
     }
 
     // physics ---------------------------------------------------------------
-    cars.forEach(car => car.update(road.borders, cars));
-    sensor.update(road.borders, cars);
-    const inputs = sensor.readings.map(s => s === null ? 0.0 : 1.0 - s.offset);
-    inputs.push(player.speed / player.maxSpeed);
-    const outputs = brain.feedForward(inputs);
-    humanPlayer.updateAI(outputs);
+    npcs.forEach(npc => npc.update(road.borders, []));
+    bots.forEach(bot => bot.update(road.borders, npcCars));
+
+    const bestBot = bots.reduce((best, bot) => {
+        return bot.car.y < best.car.y ? bot : best;
+    }, bots[0]);
 
     // view ------------------------------------------------------------------
-    hud.update(player);
-    hud.update(humanPlayer);
+    hud.update(bestBot.car);
+    hud.update(bestBot);
     context.clearRect(0, 0, canvas.width, canvas.height);
     context.save();
 
     // camera
-    context.translate(-player.x + canvas.width * 0.5, -player.y + canvas.height * 0.65);
+    context.translate(-bestBot.car.x + canvas.width * 0.5, -bestBot.car.y + canvas.height * 0.65);
 
     road.draw(context);
-    cars.forEach(car => car.draw(context));
-    sensor.draw(context);
+    npcs.forEach(npc => npc.car.draw(context));
+    bots.forEach(bot => bot.car.draw(context));
+    bestBot.sensor.draw(context);
 
     context.restore();
-    nnVisualizer.update(context, {x: 50, y: 50, width: canvas.width - 100, height: canvas.height * 0.6 - 200});
+    nnVisualizer.update(context, {x: 50, y: 50, width: canvas.width - 100, height: canvas.height * 0.6 - 200}, bestBot.brain);
 
     requestAnimationFrame(animate);
 }
