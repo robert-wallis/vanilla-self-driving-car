@@ -6,6 +6,7 @@ updateCanvasSize(); // get accurate canvas before laying out screen
 const hud = new Hud();
 const LANES = 5;
 const START_Y = 900000;
+const RAY_COUNT = 5;
 
 let humanPlayer = new HumanControls();
 let road = new Road(canvas.width * 0.5, 500 * 0.9, LANES);
@@ -13,21 +14,47 @@ const nnVisualizer = new NNVisualizer();
 
 let npcs = [];
 let npcCars = [];
-for (let i = 0; i < LANES - 1; i++) {
-    const car = new Car({
-        x: road.laneCenter(i),
-        y: START_Y - 300,
-        scale: 0.6,
-        imageFilename: "van.png",
-        maxSpeed: 9,
-    });
-    const controls = new AIForwardControls(car);
-    npcs.push(controls);
-    npcCars.push(car);
+function makeWave(wave, yOffset) {
+    for (let i = 0; i < wave.length; i++) {
+        if (!wave[i])
+            continue;
+        const car = new Car({
+            x: road.laneCenter(i),
+            y: START_Y - yOffset,
+            scale: 0.6,
+            imageFilename: "van.png",
+            maxSpeed: 9,
+        });
+        const controls = new AIForwardControls(car);
+        npcs.push(controls);
+        npcCars.push(car);
+    }
 }
+let yOffset = 0;
+makeWave([true, false, true, true, true], yOffset+=250);
+makeWave([true, true, false, true, true], yOffset+=300);
+makeWave([true, true, false, true, true], yOffset+=300);
+makeWave([false, true, true, true, true], yOffset+=330);
+makeWave([true, true, true, false, true], yOffset+=350);
+makeWave([true, true, false, true, true], yOffset+=300);
+makeWave([true, true, true, true, false], yOffset+=300);
+makeWave([false, true, true, true, true], yOffset+=300);
 
+let mutateAmount = labelInputLoad("mutateAmount", 0.1);
 let bots = [];
-for (let i = 0; i < 100; i++) {
+let npcCount = labelInputLoad("npcCount", 100);
+for (let i = 0; i < npcCount; i++) {
+    let brain;
+    if (i == 0) {
+        brain = loadBest();
+        if (!brain) {
+            mutateAmount = 1.0;
+            brain = NeuralNetwork.initRandom([RAY_COUNT + 1, 7, 4], ['gas', 'brake', 'left', 'right']);
+        }
+    } else {
+        brain = NeuralNetwork.initDeserialize(bots[0].brain);
+        brain.mutateWeightsAndBiases(mutateAmount);
+    }
     const car = new Car({
         x: road.laneCenter(2),
         y: START_Y,
@@ -35,9 +62,10 @@ for (let i = 0; i < 100; i++) {
         imageFilename: "van.png",
         maxSpeed: 11,
     });
-    const controls = new NNControls(car);
+    const controls = new NNControls(car, brain, RAY_COUNT);
     bots.push(controls);
 }
+let bestBot = bots[0];
 
 window.addEventListener("resize", updateCanvasSize);
 animate();
@@ -52,24 +80,52 @@ function updateCanvasSize() {
     }
 }
 
+function loadBest() {
+    let json = localStorage.getItem("bestBrain");
+    if (!json) {
+        return null;
+    }
+    let obj = JSON.parse(json);
+    return NeuralNetwork.initDeserialize(obj);
+}
+
+function onSave() {
+    localStorage.setItem("bestBrain", JSON.stringify(bestBot.brain));
+}
+
+function onReset() {
+    // noinspection SillyAssignmentJS
+    window.location.href = window.location.href;
+}
+
+function onDeleteSave() {
+    localStorage.removeItem("bestBrain");
+}
+
 function animate() {
     // input -----------------------------------------------------------------
-    if (humanPlayer.reset) {
-        // noinspection SillyAssignmentJS
-        window.location.href = window.location.href;
+    if (humanPlayer.reset === true) {
+        onReset();
+    }
+    if (humanPlayer.save === true) {
+        onSave();
+    }
+    if (humanPlayer.delete === true) {
+        onDeleteSave();
     }
 
     // physics ---------------------------------------------------------------
     npcs.forEach(npc => npc.update(road.borders, []));
     bots.forEach(bot => bot.update(road.borders, npcCars));
 
-    const bestBot = bots.reduce((best, bot) => {
+    bestBot = bots.reduce((best, bot) => {
         return bot.car.y < best.car.y ? bot : best;
     }, bots[0]);
 
     // view ------------------------------------------------------------------
     hud.update(bestBot.car);
     hud.update(bestBot);
+    hud.update(humanPlayer);
     context.clearRect(0, 0, canvas.width, canvas.height);
     context.save();
 
@@ -78,7 +134,12 @@ function animate() {
 
     road.draw(context);
     npcs.forEach(npc => npc.car.draw(context));
+
+    context.globalAlpha=0.2;
     bots.forEach(bot => bot.car.draw(context));
+    context.globalAlpha=1.0;
+    bestBot.car.draw(context);
+
     bestBot.sensor.draw(context);
 
     context.restore();

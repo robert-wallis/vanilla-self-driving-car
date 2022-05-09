@@ -1,6 +1,7 @@
 <html lang="en-us">
 <head>
     <title>Robert's Vanilla js self driving car</title>
+    <meta charset="UTF-8">
     <link rel="stylesheet" href="style.css">
     <link rel="preload" href="van.png" as="image">
     <link rel="preload" href="van_D_brake.png" as="image">
@@ -21,7 +22,19 @@
         <tr><td>x</td><td id="xValue"></td></tr>
         <tr><td>y</td><td id="yValue"></td></tr>
     </table>
+    <button onclick="onSave()">💾</button>
+    <button onclick="onDeleteSave()">🗑</button>
+    <button onclick="onReset()">♻️</button>
+    <div>
+        <label id=npcCountLabel for=npcCountInput>100</label>
+        <input id=npcCountInput type="range" min="1" max="1000" onchange="labelInputSave('npcCount', this.value)" value="100" />
+    </div>
+    <div>
+        <label id=mutateAmountLabel for=mutateAmountInput>0.1</label>
+        <input id=mutateAmountInput type="range" step="0.01" min="0.0" max="1.0" onchange="labelInputSave('mutateAmount', this.value)" value="0.1" />
+    </div>
 </div>
+<script src="html.js"></script>
 <script src="math.js"></script>
 <script src="color.js"></script>
 <script src="nn.js"></script>

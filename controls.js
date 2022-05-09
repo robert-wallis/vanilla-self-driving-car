@@ -11,15 +11,16 @@ class Controls {
 class HumanControls extends Controls {
     constructor() {
         super();
+        this.save = null;
+        this.delete = null;
         this.keymap = {
             "ArrowUp": "gas",
-            "w": "gas",
             "ArrowDown": "brake",
-            "s": "brake",
             "ArrowLeft": "left",
-            "a": "left",
             "ArrowRight": "right",
-            "d": "right",
+            "s": "save",
+            "r": "reset",
+            "x": "delete",
             "Escape": "reset",
             "Esc": "reset",
         }
@@ -55,14 +56,17 @@ class AIForwardControls extends Controls {
 }
 
 class NNControls extends Controls {
-    constructor(car) {
+    constructor(car, brain=null, rayCount=5) {
         super();
         this.car = car;
-        this.sensor = new Sensor(car);
-        this.brain = new NeuralNetwork([this.sensor.rayCount + 1, 6, ['gas', 'brake', 'left', 'right']]);
+        this.sensor = new Sensor(car, rayCount);
+        this.brain = brain;
     }
 
     update(borders, npcs) {
+        if (this.car.damaged) {
+            return;
+        }
         this.sensor.update(borders, npcs);
         const inputs = this.sensor.readings.map(s => s === null ? 0.0 : 1.0 - s.offset);
         inputs.push(this.car.speed / this.car.maxSpeed);
