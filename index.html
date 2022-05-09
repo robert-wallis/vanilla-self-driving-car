@@ -11,6 +11,10 @@
 <body>
 <canvas id="canvas"></canvas>
 <div id="hud">
+    <div>
+        <label for=viewNetworkInput>view network:</label>
+        <input id=viewNetworkInput type="checkbox" onchange="labelInputSave('viewNetwork', this.checked)" checked />
+    </div>
     <table>
         <tr><td>speed</td><td id="speedValue"></td></tr>
         <tr><td>gear</td><td id="gearValue"></td></tr>

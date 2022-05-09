@@ -40,6 +40,7 @@ makeWave([true, true, false, true, true], yOffset+=300);
 makeWave([true, true, true, true, false], yOffset+=300);
 makeWave([false, true, true, true, true], yOffset+=300);
 
+let viewNetwork = labelInputLoad("viewNetwork", false);
 let mutateAmount = labelInputLoad("mutateAmount", 0.1);
 let scientificMode = labelInputLoad("scientific", false);
 let scientificIterations = 1;
@@ -158,7 +159,9 @@ function animate() {
     bestBot.sensor.draw(context);
 
     context.restore();
-    nnVisualizer.update(context, {x: 50, y: 50, width: canvas.width - 100, height: canvas.height * 0.6 - 200}, bestBot.brain);
+    if (localStorage.viewNetwork == 'true') {
+        nnVisualizer.update(context, {x: 50, y: 50, width: canvas.width - 100, height: canvas.height * 0.6 - 200}, bestBot.brain);
+    }
 
     requestAnimationFrame(animate);
 }
