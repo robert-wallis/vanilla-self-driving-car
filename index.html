@@ -22,6 +22,7 @@
         <tr><td>angle</td><td id="angleValue"></td></tr>
         <tr><td>x</td><td id="xValue"></td></tr>
         <tr><td>y</td><td id="yValue"></td></tr>
+        <tr><td>remaining</td><td id="remainingValue"></td></tr>
     </table>
     <button onclick="onSave()">💾</button>
     <button onclick="onDeleteSave()">🗑</button>
@@ -35,6 +36,10 @@
         <label for=mutateAmountInput>mutation:</label>
         <label id=mutateAmountLabel for=mutateAmountInput>0.1</label>
         <input id=mutateAmountInput type="range" step="0.01" min="0.0" max="1.0" onchange="labelInputSave('mutateAmount', this.value)" value="0.1" />
+    </div>
+    <div>
+        <label for=scientificInput>scientific:</label>
+        <input id=scientificInput type="checkbox" onchange="labelInputSave('scientific', this.checked)" checked />
     </div>
 </div>
 <script src="html.js"></script>

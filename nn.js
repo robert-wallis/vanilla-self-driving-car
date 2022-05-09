@@ -50,6 +50,50 @@ class NeuralNetwork {
             }
         });
     }
+
+    // only change one paramater at a time
+    mutateScientifically(id, newValue, amount=1.0) {
+        let current = 0;
+        let range = this.apply();
+        let it = range.next();
+        while (!it.done) {
+            if (current == id) {
+                range.next(lerp(it.value, newValue, amount));
+                break;
+            }
+            current++;
+            it = range.next();
+        }
+    }
+
+    countNetworkSize() {
+        let count = 0;
+        for (const _ of this.apply()) {
+            count++;
+        }
+        return count;
+    }
+
+    // yields every weight and bias
+    *apply() {
+        for (let l = 0; l < this.layers.length; l++) {
+            const layer = this.layers[l];
+            for (let i = 0; i < layer.weights.length; i++) {
+                for (let o = 0; o < layer.weights[i].length; o++) {
+                    const weight = yield layer.weights[i][o];
+                    if (weight !== undefined) {
+                        layer.weights[i][o] = weight;
+                    }
+                }
+            }
+            for (let b = 0; b < layer.biases.length; b++) {
+                const bias = yield layer.biases[b];
+                if (bias !== undefined) {
+                    layer.biases[b] = bias;
+                }
+            }
+        }
+    }
 }
 
 class NNLayer {

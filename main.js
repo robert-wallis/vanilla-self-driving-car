@@ -31,7 +31,7 @@ function makeWave(wave, yOffset) {
     }
 }
 let yOffset = 0;
-makeWave([true, false, true, true, true], yOffset+=250);
+makeWave([true, false, true, true, true], yOffset+=500);
 makeWave([true, true, false, true, true], yOffset+=300);
 makeWave([true, true, false, true, true], yOffset+=300);
 makeWave([false, true, true, true, true], yOffset+=330);
@@ -41,6 +41,8 @@ makeWave([true, true, true, true, false], yOffset+=300);
 makeWave([false, true, true, true, true], yOffset+=300);
 
 let mutateAmount = labelInputLoad("mutateAmount", 0.1);
+let scientificMode = labelInputLoad("scientific", false);
+let scientificIterations = 1;
 let bots = [];
 let npcCount = labelInputLoad("npcCount", 100);
 for (let i = 0; i < npcCount; i++) {
@@ -51,9 +53,20 @@ for (let i = 0; i < npcCount; i++) {
             mutateAmount = 1.0;
             brain = NeuralNetwork.initRandom([RAY_COUNT + 1, 7, 4], ['gas', 'brake', 'left', 'right']);
         }
+        if (scientificMode) {
+            let brainSize = brain.countNetworkSize();
+            scientificIterations = Math.max(1, Math.floor(npcCount / brainSize));
+            npcCount = brainSize * scientificIterations;
+            labelInputSave("npcCount", npcCount);
+        }
     } else {
         brain = NeuralNetwork.initDeserialize(bots[0].brain);
-        brain.mutateWeightsAndBiases(mutateAmount);
+        if (scientificMode) {
+            // i - 1 because 0 is the original car, and 0 is the first weight too
+            brain.mutateScientifically(i - 1, mutateAmount, 1 / scientificIterations);
+        } else {
+            brain.mutateWeightsAndBiases(mutateAmount);
+        }
     }
     const car = new Car({
         x: road.laneCenter(2),
@@ -123,9 +136,11 @@ function animate() {
     }, bots[0]);
 
     // view ------------------------------------------------------------------
+    hud.update({
+        remaining: bots.reduce((count, bot) => count + (bot.car.damaged ? 0 : 1), 0),
+    });
     hud.update(bestBot.car);
     hud.update(bestBot);
-    hud.update(humanPlayer);
     context.clearRect(0, 0, canvas.width, canvas.height);
     context.save();
 
